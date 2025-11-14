@@ -1,0 +1,261 @@
+import React, { useState, useEffect } from "react";
+import { Shield, Eye, EyeOff, ArrowRight } from "lucide-react";
+
+export default function LoginPage() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const user = localStorage.getItem("goPhishingUser");
+    if (user) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setError(""); // Clear error when user starts typing
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Simulate API call delay
+    setTimeout(() => {
+      // Basic validation
+      if (!formData.email || !formData.password) {
+        setError("Please fill in all fields");
+        setIsLoading(false);
+        return;
+      }
+
+      if (!formData.email.includes("@")) {
+        setError("Please enter a valid email address");
+        setIsLoading(false);
+        return;
+      }
+
+      // Simulate successful login
+      const userData = {
+        email: formData.email,
+        name: formData.email.split("@")[0],
+        loginTime: new Date().toISOString(),
+      };
+
+      localStorage.setItem("goPhishingUser", JSON.stringify(userData));
+
+      // Set default plan if none exists
+      if (!localStorage.getItem("goPhishingPlan")) {
+        localStorage.setItem("goPhishingPlan", "free");
+      }
+
+      setIsLoading(false);
+      window.location.href = "/dashboard";
+    }, 1000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-inter flex flex-col">
+      {/* Google Fonts */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <a href="/" className="flex items-center space-x-3">
+              <Shield className="w-8 h-8 text-[#1a73e8]" />
+              <span className="font-playfair font-semibold text-xl text-[#0f172a]">
+                GoPhishing
+              </span>
+            </a>
+            <a
+              href="/signup"
+              className="text-[#1a73e8] hover:text-blue-700 font-medium transition-colors"
+            >
+              Sign up
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h2 className="font-playfair text-3xl font-semibold text-[#0f172a] mb-2">
+              Welcome back
+            </h2>
+            <p className="text-gray-600">Sign in to your GoPhishing account</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a73e8] focus:border-transparent outline-none transition-all"
+                  placeholder="Enter your email"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a73e8] focus:border-transparent outline-none transition-all pr-10"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-[#1a73e8] focus:ring-[#1a73e8] border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-700"
+                >
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <a
+                  href="#"
+                  className="font-medium text-[#1a73e8] hover:text-blue-700 transition-colors"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`w-full flex justify-center items-center space-x-2 py-3 px-4 border border-transparent rounded-lg text-white font-semibold transition-all ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#1a73e8] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1a73e8]"
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign in</span>
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{" "}
+              <a
+                href="/signup"
+                className="font-medium text-[#1a73e8] hover:text-blue-700 transition-colors"
+              >
+                Sign up for free
+              </a>
+            </p>
+          </div>
+
+          {/* Demo credentials info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-blue-900 mb-2">
+              Demo Mode
+            </h4>
+            <p className="text-sm text-blue-700">
+              This is a demo application. You can use any email and password to
+              sign in.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-sm text-gray-500">
+            <p>&copy; 2024 GoPhishing. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+      <style jsx global>{`
+        .font-inter {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        .font-playfair {
+          font-family: 'Playfair Display', Georgia, serif;
+        }
+      `}</style>
+    </div>
+  );
+}
